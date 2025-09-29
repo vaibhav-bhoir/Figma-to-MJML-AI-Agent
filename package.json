@@ -1,0 +1,42 @@
+{
+  "name": "figma-to-mjml-ai-agent",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI agent that converts Figma designs and images to MJML email templates",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.2",
+    "formidable": "^3.0.0",
+    "mjml": "^4.15.0",
+    "multer": "^1.4.5-lts.1",
+    "next": "^14.0.0",
+    "node-fetch": "^3.0.0",
+    "openai": "^4.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.0.0",
+    "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "figma",
+    "mjml",
+    "email-templates",
+    "ai",
+    "nextjs",
+    "litmus"
+  ]
+}
