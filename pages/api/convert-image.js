@@ -60,55 +60,48 @@ export default async function handler(req, res) {
       });
     }
     
-    // Step 1: Analyze image
-    let imageAnalysis;
+    // Step 1: Analyze image with multi-provider AI
+    let imageAnalysisResult;
     let usedFallback = false;
-    const hasOpenAI = process.env.OPENAI_API_KEY;
     
-    if (hasOpenAI) {
-      try {
-        console.log('🔍 Analyzing image with AI...');
-        imageAnalysis = await analyzeImageWithAI(imageBuffer, {
-          detail: 'high',
-          prompt: 'Analyze this image for email template conversion. Describe the layout, text content, visual elements, colors, and structure that would be relevant for creating a responsive email template.'
-        });
-        console.log('✨ AI analysis completed');
-      } catch (error) {
-        console.warn('⚠️ AI analysis failed, using fallback:', error.message);
-        imageAnalysis = 'Image uploaded for email template conversion. The system will generate a basic template structure.';
-        usedFallback = true;
-      }
-    } else {
-      console.log('📝 Using basic image analysis (no OpenAI key)');
-      imageAnalysis = 'Image uploaded for email template conversion. The system will generate a basic template structure.';
+    try {
+      console.log('🔍 Analyzing image with multi-provider AI...');
+      imageAnalysisResult = await analyzeImageWithAI(imageBuffer, {
+        detail: 'high',
+        prompt: 'Analyze this image for email template conversion. Describe the layout, text content, visual elements, colors, and structure that would be relevant for creating a responsive email template.'
+      });
+      
+      console.log('✨ Image analysis completed');
+      usedFallback = !imageAnalysisResult.metadata?.aiUsed;
+      
+    } catch (error) {
+      console.warn('⚠️ Image analysis failed:', error.message);
+      imageAnalysisResult = {
+        success: false,
+        analysis: 'Image uploaded for email template conversion. Using basic template structure.',
+        metadata: { aiUsed: false }
+      };
       usedFallback = true;
     }
     
-    // Step 2: Generate MJML
+    // Extract analysis text for MJML generation
+    const imageAnalysis = imageAnalysisResult.analysis || imageAnalysisResult;
+    
+    // Step 2: Generate MJML with multi-provider system
     let mjmlCode;
     
-    if (hasOpenAI && !usedFallback) {
-      try {
-        console.log('🤖 Generating MJML from image analysis...');
-        mjmlCode = await generateMJMLFromImage(imageAnalysis, {
-          width: metadata.width,
-          height: metadata.height,
-          format: metadata.format,
-          filename: imageFile.originalFilename
-        });
-        console.log('✨ AI MJML generation successful');
-      } catch (error) {
-        console.warn('⚠️ AI MJML generation failed, using fallback:', error.message);
-        mjmlCode = generateFallbackMJMLFromImage({
-          width: metadata.width,
-          height: metadata.height,
-          format: metadata.format,
-          filename: imageFile.originalFilename
-        });
-        usedFallback = true;
-      }
-    } else {
-      console.log('📝 Using fallback MJML generation');
+    try {
+      console.log('🚀 Generating MJML from image with multi-provider AI...');
+      mjmlCode = await generateMJMLFromImage(imageAnalysis, {
+        width: metadata.width,
+        height: metadata.height,
+        format: metadata.format,
+        filename: imageFile.originalFilename,
+        analysisMetadata: imageAnalysisResult.metadata
+      });
+      console.log('✨ Multi-provider MJML generation successful');
+    } catch (error) {
+      console.warn('⚠️ All providers failed, using basic fallback:', error.message);
       mjmlCode = generateFallbackMJMLFromImage({
         width: metadata.width,
         height: metadata.height,

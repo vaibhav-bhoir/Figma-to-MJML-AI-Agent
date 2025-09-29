@@ -7,7 +7,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "demo:ai": "node scripts/demo-ai-providers.mjs",
+    "test:providers": "node scripts/demo-multi-provider.mjs",
+    "demo:multi": "node scripts/demo-multi-provider.mjs"
   },
   "dependencies": {
     "dotenv": "^17.2.2",

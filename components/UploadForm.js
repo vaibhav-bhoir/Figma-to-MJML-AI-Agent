@@ -3,13 +3,22 @@
  * Handles both Figma URL input and image file uploads
  */
 
-import { useState } from 'react';
+import { forwardRef, useImperativeHandle, useState } from 'react';
 
-export default function UploadForm({ onConvert, isLoading }) {
+const UploadForm = forwardRef(({ onConvert, isLoading }, ref) => {
   const [activeTab, setActiveTab] = useState('figma');
   const [figmaInput, setFigmaInput] = useState('');
   const [imageFile, setImageFile] = useState(null);
   const [dragOver, setDragOver] = useState(false);
+  
+  // Expose clearInputs method to parent component
+  useImperativeHandle(ref, () => ({
+    clearInputs: () => {
+      setFigmaInput('');
+      setImageFile(null);
+      setDragOver(false);
+    }
+  }));
   
   // Extract file ID from Figma URL
   const extractFigmaId = (url) => {
@@ -355,4 +364,8 @@ export default function UploadForm({ onConvert, isLoading }) {
       `}</style>
     </div>
   );
-}
+});
+
+UploadForm.displayName = 'UploadForm';
+
+export default UploadForm;

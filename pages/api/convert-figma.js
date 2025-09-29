@@ -75,34 +75,30 @@ export default async function handler(req, res) {
     
     console.log(`✅ Found ${emailFrames.length} suitable frames for email conversion`);
     
-    // Step 4: Generate MJML
+    // Step 4: Generate MJML with Multi-Provider AI
     let mjmlCode;
     let usedFallback = false;
-    const hasOpenAI = process.env.OPENAI_API_KEY;
+    let aiProvider = 'unknown';
     
-    if (hasOpenAI) {
-      try {
-        console.log('🤖 Generating MJML with AI...');
-        mjmlCode = await generateMJMLFromLayout({
-          fileName: layoutData.fileName,
-          layouts: emailFrames
-        });
-        console.log('✨ AI generation successful');
-      } catch (aiError) {
-        console.warn('⚠️ AI generation failed, using fallback:', aiError.message);
-        mjmlCode = generateFallbackMJML({
-          fileName: layoutData.fileName,
-          layouts: emailFrames
-        });
-        usedFallback = true;
-      }
-    } else {
-      console.log('📝 Using fallback MJML generation (no OpenAI key)');
+    try {
+      console.log('🚀 Starting multi-provider AI generation...');
+      mjmlCode = await generateMJMLFromLayout({
+        fileName: layoutData.fileName,
+        layouts: emailFrames
+      });
+      console.log('✨ Multi-provider AI generation successful');
+      
+      // The generateMJMLFromLayout now handles all providers internally
+      // including intelligent fallback, so this should always succeed
+      
+    } catch (aiError) {
+      console.warn('⚠️ All AI providers failed, using basic fallback:', aiError.message);
       mjmlCode = generateFallbackMJML({
         fileName: layoutData.fileName,
         layouts: emailFrames
       });
       usedFallback = true;
+      aiProvider = 'basic-fallback';
     }
     
     // Step 5: Validate MJML

@@ -4,7 +4,7 @@
  */
 
 import Head from 'next/head';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import ConversionResults from '../components/ConversionResults';
 import UploadForm from '../components/UploadForm';
 
@@ -13,6 +13,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [litmusResults, setLitmusResults] = useState(null);
+  const uploadFormRef = useRef(null);
 
   const handleConvert = async (type, data) => {
     setIsLoading(true);
@@ -44,6 +45,11 @@ export default function Home() {
       }
 
       setConversionResult(result);
+      
+      // Clear inputs after successful conversion
+      if (uploadFormRef.current && uploadFormRef.current.clearInputs) {
+        uploadFormRef.current.clearInputs();
+      }
     } catch (err) {
       console.error('Conversion error:', err);
       setError(err.message || 'An unexpected error occurred during conversion');
@@ -175,7 +181,7 @@ export default function Home() {
         )}
 
         {/* Upload Form */}
-        <UploadForm onConvert={handleConvert} isLoading={isLoading} />
+        <UploadForm ref={uploadFormRef} onConvert={handleConvert} isLoading={isLoading} />
 
         {/* Loading State */}
         {isLoading && (
@@ -197,7 +203,7 @@ export default function Home() {
         {/* Conversion Results */}
         {conversionResult && (
           <ConversionResults 
-            result={conversionResult} 
+            results={conversionResult} 
             onSendToLitmus={handleSendToLitmus}
           />
         )}
@@ -337,7 +343,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="app-footer">
         <p>
-          Built with ❤️ using Next.js, OpenAI, MJML, and Litmus API
+          Built with ❤️ by VAIBHAV BHOIR using Next.js, OpenAI, MJML, and Litmus API
         </p>
         <p className="footer-note">
           This is a prototype demonstration of AI-powered email template generation
